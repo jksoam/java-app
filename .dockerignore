@@ -1,0 +1,11 @@
+.git
+.gitignore
+target/
+.settings/
+.project
+.classpath
+.vscode/
+*.md
+helm/
+Jenkinsfile
+.dockerignore

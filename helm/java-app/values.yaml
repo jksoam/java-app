@@ -1,0 +1,108 @@
+replicaCount: 2
+
+image:
+  repository: your-docker-registry/java-app
+  tag: latest
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: java-app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: java-app-tls
+      hosts:
+        - java-app.example.com
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - java-app
+          topologyKey: kubernetes.io/hostname
+
+livenessProbe:
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  failureThreshold: 3
+  httpGet:
+    path: /health/live
+    port: http
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 3
+  httpGet:
+    path: /health/ready
+    port: http
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+env: []
+  # - name: SPRING_PROFILES_ACTIVE
+  #   value: "prod"
+
+configmap:
+  enabled: false
+  data: {}
+
+secret:
+  enabled: false
+  data: {}
