@@ -8,7 +8,6 @@ pipeline {
     environment {
         PATH = "/opt/maven/bin:$PATH"
         JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
-        SONAR = credentials('sonar-token')
     }   
     
     stages {
@@ -28,17 +27,18 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            environment {
+                SONAR_TOKEN = credentials('sonar-token')
+            }
             steps {
                 script {
-                    withSonarQubeEnv(credentialsId: 'sonar-token', installationName: 'SonarCloud') {
-                        sh '''
-                            mvn sonar:sonar \
-                                -Dsonar.projectKey=jksoam_java-app \
-                                -Dsonar.organization=jksoam \
-                                -Dsonar.host.url=https://sonarcloud.io \
-                                -Dsonar.token=${SONAR}
-                        '''
-                    }
+                    sh '''
+                        mvn sonar:sonar \
+                            -Dsonar.projectKey=jksoam_java-app \
+                            -Dsonar.organization=jksoam \
+                            -Dsonar.host.url=https://sonarcloud.io \
+                            -Dsonar.token=${SONAR_TOKEN}
+                    '''
                 }
             }
         }
