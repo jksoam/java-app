@@ -3,7 +3,7 @@ pipeline {
     
     tools {
         maven 'Maven 3.9.6'
-        jdk 'JDK 11'
+        jdk 'JDK 17'
     }
     
     stages {
@@ -15,7 +15,7 @@ pipeline {
         
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -Dmaven.compiler.source=17 -Dmaven.compiler.target=17'
             }
         }
         
@@ -54,10 +54,10 @@ pipeline {
             cleanWs()
         }
         success {
-            echo 'Build successful! Deployed to Tomcat server.'
+            echo 'Build succeeded!'
         }
         failure {
-            echo 'Build failed! Check the logs for details.'
+            echo 'Build failed!'
         }
     }
 }
