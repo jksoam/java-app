@@ -27,18 +27,15 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                SONAR_TOKEN = credentials('sonar-token')
-            }
             steps {
-                script {
-                    sh '''
-                        mvn sonar:sonar \
-                            -Dsonar.projectKey=jksoam_java-app \
-                            -Dsonar.organization=jksoam \
-                            -Dsonar.host.url=https://sonarcloud.io \
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh """
+                        mvn sonar:sonar \\
+                            -Dsonar.projectKey=jksoam_java-app \\
+                            -Dsonar.organization=jksoam \\
+                            -Dsonar.host.url=https://sonarcloud.io \\
                             -Dsonar.token=${SONAR_TOKEN}
-                    '''
+                    """
                 }
             }
         }
