@@ -8,6 +8,7 @@ pipeline {
     environment {
         PATH = "/opt/maven/bin:$PATH"
         JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
+        SONAR_TOKEN = credentials('sonar-token')
     }   
     
     stages {
@@ -47,6 +48,26 @@ pipeline {
             post {
                 success {
                     archiveArtifacts artifacts: 'target/*.war', fingerprint: true
+                }
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarCloud') {
+                    sh '''
+                        mvn sonar:sonar \
+                            -Dsonar.projectKey=jksoam_java-app \
+                            -Dsonar.organization=jksoam \
+                            -Dsonar.host.url=https://sonarcloud.io \
+                            -Dsonar.login=$SONAR_TOKEN
+                    '''
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
