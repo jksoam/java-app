@@ -11,6 +11,29 @@ pipeline {
     }   
     
     stages {
+        stage('Check Environment') {
+            steps {
+                sh '''
+                    echo "Finding Java path:"
+                    which java
+                    readlink -f $(which java)
+                    echo "\nJava version:"
+                    java -version
+                    
+                    echo "\nFinding Maven path:"
+                    which mvn
+                    readlink -f $(which mvn)
+                    echo "\nMaven version:"
+                    mvn -version
+                    
+                    echo "\nChecking common Java paths:"
+                    ls -l /usr/lib/jvm/
+                    
+                    echo "\nChecking system PATH:"
+                    echo $PATH
+                '''
+            }
+        }
         stage('Build') {
             steps {
                 sh '''

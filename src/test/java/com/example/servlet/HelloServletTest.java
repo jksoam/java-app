@@ -1,37 +1,39 @@
 package com.example.servlet;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-@RunWith(JUnit4.class)
-public class HelloServletTest {
+class HelloServletTest {
     
     private HelloServlet servlet;
+    
+    @Mock
     private HttpServletRequest request;
+    
+    @Mock
     private HttpServletResponse response;
+    
+    @Mock
     private RequestDispatcher dispatcher;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
         servlet = new HelloServlet();
-        request = mock(HttpServletRequest.class);
-        response = mock(HttpServletResponse.class);
-        dispatcher = mock(RequestDispatcher.class);
     }
 
     @Test
-    public void testDoGetWithName() throws ServletException, IOException {
+    void testDoGetWithName() throws ServletException, IOException {
         // Given
         String name = "John";
         when(request.getParameter("name")).thenReturn(name);
@@ -47,7 +49,7 @@ public class HelloServletTest {
     }
 
     @Test
-    public void testDoGetWithoutName() throws ServletException, IOException {
+    void testDoGetWithoutName() throws ServletException, IOException {
         // Given
         when(request.getParameter("name")).thenReturn(null);
         when(request.getRequestDispatcher("/WEB-INF/views/hello.jsp")).thenReturn(dispatcher);
