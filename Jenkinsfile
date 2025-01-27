@@ -4,12 +4,16 @@ pipeline {
             label 'mvn'
         }
     }
+environment {
+    PATH = "/opt/maven/bin:$PATH"
+}   
     
     stages {
-        stage('Clone-code') {
+        stage( "build" ) {
             steps {
-                git branch: 'main', url: 'https://github.com/jksoam/java-app.git'
+                sh 'mvn clean package'
             }
         }
+        
     }
 }
