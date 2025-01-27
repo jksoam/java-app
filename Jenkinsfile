@@ -1,3 +1,25 @@
+/*
+Prerequisites for Jenkins:
+1. Install "JDK" tool:
+   - Go to Manage Jenkins > Tools
+   - Add JDK installation:
+     - Name: "jdk17"
+     - Install automatically: Check
+     - Select "Java SE Development Kit 17"
+
+2. Install "Maven" tool:
+   - Go to Manage Jenkins > Tools
+   - Add Maven installation:
+     - Name: "maven3"
+     - Install automatically: Check
+     - Select version "3.9.6"
+
+3. Required Plugins:
+   - Docker Pipeline
+   - Kubernetes CLI
+   - Kubernetes
+*/
+
 pipeline {
     agent any
     
@@ -9,8 +31,8 @@ pipeline {
     }
     
     tools {
-        maven 'Maven 3.9.6'
-        jdk 'JDK 17'
+        maven 'maven3'
+        jdk 'jdk17'
     }
     
     stages {
@@ -67,7 +89,6 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Update Helm values with the new image tag
                     sh """
                         helm upgrade --install my-java-app helm/java-app \
                         --set image.repository=${DOCKER_IMAGE} \
